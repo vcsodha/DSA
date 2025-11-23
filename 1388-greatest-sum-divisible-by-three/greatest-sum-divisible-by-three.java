@@ -1,7 +1,6 @@
 class Solution {
 
     public int maxSumDivThree(int[] nums) {
-        // Use v[0], v[1], v[2] to represent a, b, c respectively.
         List<Integer>[] v = new List[3];
         for (int i = 0; i < 3; ++i) {
             v[i] = new ArrayList<Integer>();
