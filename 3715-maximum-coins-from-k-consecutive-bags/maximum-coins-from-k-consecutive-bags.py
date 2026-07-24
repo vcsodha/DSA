@@ -2,54 +2,43 @@ class Solution:
     def maximumCoins(self, coins: List[List[int]], k: int) -> int:
         coins.sort()
         n = len(coins)
-
-        prefix_sum = [0] * (n + 1)
-        for i in range(n):
-            segment_coins = (coins[i][1] - coins[i][0] + 1) * coins[i][2]
-            prefix_sum[i + 1] = prefix_sum[i] + segment_coins
-            
-        def find_first_ge(arr, target):
-            low, high = 0, n - 1
-            res = n
-            while low <= high:
-                mid = (low + high) // 2
-                if arr[mid] >= target:
-                    res = mid
-                    high = mid - 1
-                else:
-                    low = mid + 1
-            return res
-
-        def find_last_le(arr, target):
-            low, high = 0, n - 1
-            res = -1
-            while low <= high:
-                mid = (low + high) // 2
-                if arr[mid] <= target:
-                    res = mid
-                    low = mid + 1
-                else:
-                    high = mid - 1
-            return res
-
         ans = 0
-        starts = [c[0] for c in coins]
-        ends = [c[1] for c in coins]
         
-        for l, r, c in coins:
-            for ws, we in [(r - k + 1, r), (l, l + k - 1)]:
-                idx_start = find_first_ge(ends, ws)
-                idx_end = find_last_le(starts, we)
+        curr_coins = 0
+        right = 0
+        for i in range(n):
+            while right < n and coins[right][1] < coins[i][0] + k:
+                curr_coins += (coins[right][1] - coins[right][0] + 1) * coins[right][2]
+                right += 1
+            
+            total = curr_coins
+            if right < n and coins[right][0] < coins[i][0] + k:
+                overlap = min(coins[i][0] + k - 1, coins[right][1]) - coins[right][0] + 1
+                total += overlap * coins[right][2]
                 
-                if idx_start <= idx_end:
-                    total = prefix_sum[idx_end + 1] - prefix_sum[idx_start]
-                    
-                    if coins[idx_start][0] < ws:
-                        total -= (ws - coins[idx_start][0]) * coins[idx_start][2]
-                    
-                    if coins[idx_end][1] > we:
-                        total -= (coins[idx_end][1] - we) * coins[idx_end][2]
-                    
-                    ans = max(ans, total)
-        
+            ans = max(ans, total)
+            
+            curr_coins -= (coins[i][1] - coins[i][0] + 1) * coins[i][2]
+            if right <= i:
+                right = i + 1
+                curr_coins = 0
+
+        curr_coins = 0
+        left = n - 1
+        for i in range(n - 1, -1, -1):
+            while left >= 0 and coins[left][0] > coins[i][1] - k:
+                curr_coins += (coins[left][1] - coins[left][0] + 1) * coins[left][2]
+                left -= 1
+            
+            total = curr_coins
+            if left >= 0 and coins[left][1] > coins[i][1] - k:
+                overlap = coins[left][1] - max(coins[i][1] - k + 1, coins[left][0]) + 1
+                total += overlap * coins[left][2]
+                
+            ans = max(ans, total)
+            curr_coins -= (coins[i][1] - coins[i][0] + 1) * coins[i][2]
+            if left >= i:
+                left = i - 1
+                curr_coins = 0
+                
         return ans
