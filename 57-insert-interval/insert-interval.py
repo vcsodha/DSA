@@ -1,31 +1,24 @@
 class Solution:
     def insert(self, intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
-        res = []
-        i = 0
-        n = len(intervals)
+        # 1. Add the new interval to the list
+        intervals.append(newInterval)
         
-        # 1. Add all intervals that end before the newInterval starts
-        while i < n and intervals[i][1] < newInterval[0]:
-            res.append(intervals[i])
-            i += 1
-            
-        # 2. Merge all overlapping intervals with newInterval
-        # If they overlap, update newInterval's boundaries
-        while i < n and intervals[i][0] <= newInterval[1]:
-            
-            if intervals[i][0] < newInterval[0]:
-                newInterval[0] = intervals[i][0]
-            
-            if intervals[i][1] > newInterval[1]:
-                newInterval[1] = intervals[i][1]
-            i += 1
-            
-        # Add the merged interval
-        res.append(newInterval)
+        # 2. Sort based on the start time (first element of each sub-list)
+        # This takes O(n log n) time
+        intervals.sort(key=lambda x: x[0])
         
-        # 3. Add all remaining intervals that start after newInterval ends
-        while i < n:
-            res.append(intervals[i])
-            i += 1
+        # 3. Use your existing Merge Intervals logic to combine overlaps
+        res = [intervals[0]]
+        
+        for i in range(1, len(intervals)):
+            last = res[-1]
+            curr = intervals[i]
             
+            # If they overlap, merge them
+            if curr[0] <= last[1]:
+                last[1] = max(last[1], curr[1])
+            else:
+                # No overlap, add as a new interval
+                res.append(curr)
+                
         return res
