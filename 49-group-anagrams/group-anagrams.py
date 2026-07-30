@@ -1,21 +1,11 @@
 class Solution:
     def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
-        # Use a dictionary to store the anagram groups.
-        # Key: A tuple of 26 integers (character counts).
-        # Value: A list of strings that match that count.
-        anagram_map = defaultdict(list)
-        
+        anagram_map=defaultdict(list)
         for s in strs:
-            # Initialize a list of 26 zeros for each letter 'a'-'z'
-            count = [0] * 26
+            count = [0] *26
+            for ch in s:
+                count[ord(ch) - ord('a')] += 1
             
-            # Count the frequency of each character in the string
-            for char in s:
-                count[ord(char) - ord('a')] += 1
-            
-            # Use tuple(count) as the key because lists are mutable
-            # and cannot be used as dictionary keys in Python.
-            anagram_map[tuple(count)].append(s)
-            
-        # Return all the grouped anagrams
+            key = tuple(count)
+            anagram_map[key].append(s)
         return list(anagram_map.values())
