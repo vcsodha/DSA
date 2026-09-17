@@ -2,15 +2,12 @@ class Solution:
     def minPathSum(self, grid: list[list[int]]) -> int:
         m,n = len(grid) , len(grid[0])
 
-        @cache
-        def sum(r:int, c:int) ->int:
-            if r>=m or c>=n:
-                return float('inf')
+        dp = [float('inf')] * n
 
-            if r ==m-1 and c==n-1:
-                return grid[r][c]
-            
-            return grid[r][c] + min(sum(r+1,c) , sum(r,c+1))
+        dp[0] = 0
 
-        return sum(0,0)
-
+        for r in range(m):
+            dp[0] += grid[r][0]
+            for c in range(1,n):
+                dp[c] = grid[r][c] + min(dp[c], dp[c - 1])
+        return dp[-1]
