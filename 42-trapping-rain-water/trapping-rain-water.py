@@ -1,23 +1,19 @@
 class Solution:
     def trap(self, height: list[int]) -> int:
-        n=len(height)
-        if n==0:
-            return 0
-
-        left_max= [0] * n
-        right_max = [0] * n
-
-        left_max[0] = height[0]
-        for i in range(1,n):
-            left_max[i] = max(left_max[i-1], height[i])
-        
-        right_max[n-1] = height [n-1] #right boundary is fixed
-
-        for i in range(n-2,-1,-1):
-            right_max[i]=max(right_max[i+1], height[i])
-
         water_trapped=0
-        for i in range(n):
-            water_trapped += min(left_max[i],right_max[i]) - height[i]
+        n=len(height)
+        l,r = 0,n-1
+        l_max,r_max=0,0
 
+        while l<r:
+            l_max=max(l_max,height[l])
+            r_max=max(r_max,height[r])
+
+            if l_max<r_max:
+                water_trapped += l_max-height[l]
+                l+=1
+            else:
+                water_trapped += r_max-height[r]
+                r-=1
+            
         return water_trapped
